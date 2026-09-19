@@ -94,5 +94,6 @@ export const produtos = [
     imagem: camisetaCalvinKlein,
     disponivel: true,
     novidade: false,
+    importado: true,
   },
 ]
