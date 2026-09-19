@@ -3,9 +3,11 @@ import { Route, Routes } from 'react-router-dom'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import Catalogo from './components/Catalogo'
+import AdminRoute from './components/AdminRoute'
 
 import Produto from './pages/Produto'
 import Admin from './pages/Admin'
+import AdminLogin from './pages/AdminLogin'
 
 function Home() {
   return (
@@ -33,8 +35,17 @@ function App() {
         />
 
         <Route
+          path="/admin/login"
+          element={<AdminLogin />}
+        />
+
+        <Route
           path="/admin"
-          element={<Admin />}
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
         />
       </Routes>
     </>
