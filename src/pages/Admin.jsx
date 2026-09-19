@@ -55,6 +55,18 @@ function Admin() {
     carregarProdutos()
   }, [])
 
+  useEffect(() => {
+    if (modalAberto) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [modalAberto])
+
   const carregarProdutos = async () => {
     setCarregando(true)
     setErro('')
@@ -68,9 +80,11 @@ function Admin() {
 
     if (error) {
       console.error(error)
+
       setErro(
         'Não foi possível carregar os produtos.',
       )
+
       setCarregando(false)
       return
     }
@@ -100,16 +114,22 @@ function Admin() {
       subcategoria:
         produto.subcategoria ?? '',
       preco: produto.preco ?? '',
+
       cores:
         produto.cores?.join(', ') ?? '',
+
       tamanhos:
         produto.tamanhos?.join(', ') ?? '',
+
       disponivel:
         produto.disponivel ?? true,
+
       novidade:
         produto.novidade ?? false,
+
       importado:
         produto.importado ?? false,
+
       imagem:
         produto.imagem ?? '',
     })
@@ -122,6 +142,8 @@ function Admin() {
   }
 
   const fecharModal = () => {
+    if (salvando) return
+
     if (
       previewImagem &&
       previewImagem.startsWith('blob:')
@@ -147,6 +169,7 @@ function Admin() {
 
     setForm((estadoAtual) => ({
       ...estadoAtual,
+
       [name]:
         type === 'checkbox'
           ? checked
@@ -164,6 +187,7 @@ function Admin() {
       setErro(
         'Selecione um arquivo de imagem.',
       )
+
       return
     }
 
@@ -173,6 +197,7 @@ function Admin() {
       setErro(
         'A imagem deve ter no máximo 5 MB.',
       )
+
       return
     }
 
@@ -266,7 +291,8 @@ function Admin() {
     setMensagem('')
 
     try {
-      const imagem = await enviarImagem()
+      const imagem =
+        await enviarImagem()
 
       const slugBase =
         criarSlug(form.nome.trim())
@@ -279,8 +305,10 @@ function Admin() {
         nome: form.nome.trim(),
         marca: form.marca.trim(),
         categoria: form.categoria,
+
         subcategoria:
           form.subcategoria.trim(),
+
         preco: Number(form.preco),
 
         cores: form.cores
@@ -304,7 +332,10 @@ function Admin() {
         const { error } = await supabase
           .from('produtos')
           .update(dadosProduto)
-          .eq('id', produtoEditando.id)
+          .eq(
+            'id',
+            produtoEditando.id,
+          )
 
         if (error) {
           throw error
@@ -333,7 +364,9 @@ function Admin() {
         previewImagem &&
         previewImagem.startsWith('blob:')
       ) {
-        URL.revokeObjectURL(previewImagem)
+        URL.revokeObjectURL(
+          previewImagem,
+        )
       }
 
       setModalAberto(false)
@@ -353,10 +386,13 @@ function Admin() {
     }
   }
 
-  const excluirProduto = async (produto) => {
-    const confirmou = window.confirm(
-      `Deseja realmente excluir "${produto.nome}"?`,
-    )
+  const excluirProduto = async (
+    produto,
+  ) => {
+    const confirmou =
+      window.confirm(
+        `Deseja realmente excluir "${produto.nome}"?`,
+      )
 
     if (!confirmou) return
 
@@ -370,15 +406,18 @@ function Admin() {
 
     if (error) {
       console.error(error)
+
       setErro(
         'Não foi possível excluir o produto.',
       )
+
       return
     }
 
     setProdutos((estadoAtual) =>
       estadoAtual.filter(
-        (item) => item.id !== produto.id,
+        (item) =>
+          item.id !== produto.id,
       ),
     )
 
@@ -401,9 +440,11 @@ function Admin() {
 
       if (error) {
         console.error(error)
+
         setErro(
           'Não foi possível alterar a disponibilidade.',
         )
+
         return
       }
 
@@ -433,9 +474,11 @@ function Admin() {
 
       if (error) {
         console.error(error)
+
         setErro(
           'Não foi possível alterar o tipo do produto.',
         )
+
         return
       }
 
@@ -452,7 +495,10 @@ function Admin() {
     }
 
   const sair = () => {
-    localStorage.removeItem('lacstock-admin')
+    localStorage.removeItem(
+      'lacstock-admin',
+    )
+
     navigate('/admin/login')
   }
 
@@ -466,29 +512,29 @@ function Admin() {
     )
 
   return (
-    <main style={pagina}>
-      <section style={container}>
-        <div style={cabecalhoPagina}>
-          <div>
-            <span style={marca}>
+    <main className="admin-page">
+      <section className="admin-container">
+        <header className="admin-header">
+          <div className="admin-header__text">
+            <span className="admin-eyebrow">
               LACSTOCK
             </span>
 
-            <h1 style={tituloPagina}>
+            <h1>
               Painel administrativo
             </h1>
 
-            <p style={descricao}>
-              Gerencie os produtos disponíveis
-              no catálogo.
+            <p>
+              Gerencie os produtos
+              disponíveis no catálogo.
             </p>
           </div>
 
-          <div style={acoesCabecalho}>
+          <div className="admin-header__actions">
             <button
               type="button"
               onClick={sair}
-              style={botaoSecundario}
+              className="admin-button admin-button--secondary"
             >
               <LogOut size={17} />
               Sair
@@ -497,27 +543,27 @@ function Admin() {
             <button
               type="button"
               onClick={abrirNovoProduto}
-              style={botaoPrincipal}
+              className="admin-button admin-button--primary"
             >
               <Plus size={18} />
               Novo produto
             </button>
           </div>
-        </div>
+        </header>
 
         {erro && !modalAberto && (
-          <div style={mensagemErro}>
+          <div className="admin-message admin-message--error">
             {erro}
           </div>
         )}
 
         {mensagem && (
-          <div style={mensagemSucesso}>
+          <div className="admin-message admin-message--success">
             {mensagem}
           </div>
         )}
 
-        <div style={resumos}>
+        <div className="admin-summary-grid">
           <Resumo
             titulo="Produtos"
             valor={produtos.length}
@@ -545,7 +591,7 @@ function Admin() {
         </div>
 
         {carregando ? (
-          <div style={caixaVazia}>
+          <div className="admin-empty">
             <Package
               size={42}
               strokeWidth={1.4}
@@ -556,7 +602,7 @@ function Admin() {
             </h2>
           </div>
         ) : produtos.length === 0 ? (
-          <div style={caixaVazia}>
+          <div className="admin-empty">
             <Package
               size={42}
               strokeWidth={1.4}
@@ -566,7 +612,7 @@ function Admin() {
               Nenhum produto cadastrado
             </h2>
 
-            <p style={descricao}>
+            <p>
               Cadastre o primeiro produto
               diretamente pelo painel.
             </p>
@@ -574,28 +620,24 @@ function Admin() {
             <button
               type="button"
               onClick={abrirNovoProduto}
-              style={{
-                ...botaoPrincipal,
-                marginTop: '15px',
-              }}
+              className="admin-button admin-button--primary"
             >
               <Plus size={18} />
               Cadastrar produto
             </button>
           </div>
         ) : (
-          <div style={listaProdutos}>
+          <div className="admin-products">
             {produtos.map((produto) => (
               <article
                 key={produto.id}
-                style={cardProduto}
+                className="admin-product-card"
               >
-                <div style={fotoProduto}>
+                <div className="admin-product-card__image">
                   {produto.imagem ? (
                     <img
                       src={produto.imagem}
                       alt={produto.nome}
-                      style={imagemProduto}
                     />
                   ) : (
                     <Package
@@ -605,12 +647,12 @@ function Admin() {
                   )}
                 </div>
 
-                <div style={dadosProduto}>
-                  <small style={marcaProduto}>
+                <div className="admin-product-card__info">
+                  <small>
                     {produto.marca}
                   </small>
 
-                  <h3 style={nomeProduto}>
+                  <h3>
                     {produto.nome}
                   </h3>
 
@@ -621,7 +663,7 @@ function Admin() {
                   </strong>
                 </div>
 
-                <div style={acoesProduto}>
+                <div className="admin-product-card__actions">
                   <button
                     type="button"
                     onClick={() =>
@@ -629,10 +671,10 @@ function Admin() {
                         produto,
                       )
                     }
-                    style={
+                    className={
                       produto.disponivel
-                        ? etiquetaAtiva
-                        : etiquetaInativa
+                        ? 'admin-pill admin-pill--active'
+                        : 'admin-pill'
                     }
                   >
                     {produto.disponivel
@@ -647,10 +689,10 @@ function Admin() {
                         produto,
                       )
                     }
-                    style={
+                    className={
                       produto.importado
-                        ? etiquetaAtiva
-                        : etiquetaInativa
+                        ? 'admin-pill admin-pill--active'
+                        : 'admin-pill'
                     }
                   >
                     {produto.importado
@@ -661,12 +703,12 @@ function Admin() {
                   <button
                     type="button"
                     onClick={() =>
-                      abrirEdicao(produto)
+                      abrirEdicao(
+                        produto,
+                      )
                     }
-                    style={botaoIcone}
-                    aria-label={
-                      `Editar ${produto.nome}`
-                    }
+                    className="admin-icon-button"
+                    aria-label={`Editar ${produto.nome}`}
                   >
                     <Edit3 size={17} />
                   </button>
@@ -674,14 +716,16 @@ function Admin() {
                   <button
                     type="button"
                     onClick={() =>
-                      excluirProduto(produto)
+                      excluirProduto(
+                        produto,
+                      )
                     }
-                    style={botaoIcone}
-                    aria-label={
-                      `Excluir ${produto.nome}`
-                    }
+                    className="admin-icon-button admin-icon-button--danger"
+                    aria-label={`Excluir ${produto.nome}`}
                   >
-                    <Trash2 size={17} />
+                    <Trash2
+                      size={17}
+                    />
                   </button>
                 </div>
               </article>
@@ -691,19 +735,20 @@ function Admin() {
       </section>
 
       {modalAberto && (
-        <div style={fundoModal}>
-          <div style={modal}>
-            <div style={cabecalhoModal}>
+        <div className="admin-modal-overlay">
+          <div
+            className="admin-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-modal-title"
+          >
+            <header className="admin-modal__header">
               <div>
-                <small style={marca}>
+                <small className="admin-eyebrow">
                   LACSTOCK
                 </small>
 
-                <h2
-                  style={{
-                    margin: '5px 0 0',
-                  }}
-                >
+                <h2 id="admin-modal-title">
                   {produtoEditando
                     ? 'Editar produto'
                     : 'Novo produto'}
@@ -713,193 +758,234 @@ function Admin() {
               <button
                 type="button"
                 onClick={fecharModal}
-                style={botaoIcone}
+                className="admin-icon-button"
                 disabled={salvando}
                 aria-label="Fechar"
               >
                 <X size={20} />
               </button>
-            </div>
+            </header>
 
-            {erro && (
-              <div style={mensagemErro}>
-                {erro}
-              </div>
-            )}
-
-            <form
-              onSubmit={salvarProduto}
-              style={formulario}
-            >
-              <label style={label}>
-                Foto do produto
-
-                <div style={areaImagem}>
-                  {previewImagem ? (
-                    <img
-                      src={previewImagem}
-                      alt="Prévia do produto"
-                      style={preview}
-                    />
-                  ) : (
-                    <div style={semImagem}>
-                      <ImagePlus
-                        size={34}
-                        strokeWidth={1.4}
-                      />
-
-                      <span>
-                        Nenhuma foto selecionada
-                      </span>
-                    </div>
-                  )}
+            <div className="admin-modal__body">
+              {erro && (
+                <div className="admin-message admin-message--error">
+                  {erro}
                 </div>
+              )}
 
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={selecionarImagem}
-                  style={inputArquivo}
-                />
+              <form
+                onSubmit={salvarProduto}
+                className="admin-form"
+              >
+                <label className="admin-field">
+                  <span>
+                    Foto do produto
+                  </span>
 
-                <small style={ajuda}>
-                  No celular, toque para escolher
-                  uma foto da galeria. Máximo 5 MB.
-                </small>
-              </label>
+                  <div className="admin-image-upload">
+                    {previewImagem ? (
+                      <img
+                        src={
+                          previewImagem
+                        }
+                        alt="Prévia do produto"
+                      />
+                    ) : (
+                      <div className="admin-image-upload__empty">
+                        <ImagePlus
+                          size={36}
+                          strokeWidth={
+                            1.4
+                          }
+                        />
 
-              <Campo
-                label="Nome"
-                name="nome"
-                value={form.nome}
-                onChange={atualizarCampo}
-                required
-              />
+                        <span>
+                          Nenhuma foto
+                          selecionada
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-              <Campo
-                label="Marca"
-                name="marca"
-                value={form.marca}
-                onChange={atualizarCampo}
-                required
-              />
+                  <input
+                    className="admin-file-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={
+                      selecionarImagem
+                    }
+                  />
 
-              <div style={gradeCampos}>
-                <label style={label}>
-                  Categoria
-
-                  <select
-                    name="categoria"
-                    value={form.categoria}
-                    onChange={atualizarCampo}
-                    style={input}
-                  >
-                    <option value="Roupas">
-                      Roupas
-                    </option>
-
-                    <option value="Tênis">
-                      Tênis
-                    </option>
-
-                    <option value="Bonés">
-                      Bonés
-                    </option>
-
-                    <option value="Acessórios">
-                      Acessórios
-                    </option>
-                  </select>
+                  <small className="admin-field__help">
+                    No celular, toque para
+                    escolher uma foto da
+                    galeria. Máximo 5 MB.
+                  </small>
                 </label>
 
                 <Campo
-                  label="Subcategoria"
-                  name="subcategoria"
-                  value={form.subcategoria}
-                  onChange={atualizarCampo}
+                  label="Nome"
+                  name="nome"
+                  value={form.nome}
+                  onChange={
+                    atualizarCampo
+                  }
                   required
                 />
-              </div>
 
-              <Campo
-                label="Preço"
-                name="preco"
-                type="number"
-                min="0"
-                step="0.01"
-                value={form.preco}
-                onChange={atualizarCampo}
-                required
-              />
-
-              <Campo
-                label="Cores"
-                name="cores"
-                value={form.cores}
-                onChange={atualizarCampo}
-                placeholder="Preto, Branco, Cinza"
-                required
-              />
-
-              <Campo
-                label="Tamanhos"
-                name="tamanhos"
-                value={form.tamanhos}
-                onChange={atualizarCampo}
-                placeholder="P, M, G, GG"
-                required
-              />
-
-              <div style={checkboxes}>
-                <Checkbox
-                  name="disponivel"
-                  checked={form.disponivel}
-                  onChange={atualizarCampo}
-                  label="Disponível"
+                <Campo
+                  label="Marca"
+                  name="marca"
+                  value={form.marca}
+                  onChange={
+                    atualizarCampo
+                  }
+                  required
                 />
 
-                <Checkbox
-                  name="importado"
-                  checked={form.importado}
-                  onChange={atualizarCampo}
-                  label="Produto importado"
+                <div className="admin-form__grid">
+                  <label className="admin-field">
+                    <span>
+                      Categoria
+                    </span>
+
+                    <select
+                      name="categoria"
+                      value={
+                        form.categoria
+                      }
+                      onChange={
+                        atualizarCampo
+                      }
+                    >
+                      <option value="Roupas">
+                        Roupas
+                      </option>
+
+                      <option value="Tênis">
+                        Tênis
+                      </option>
+
+                      <option value="Bonés">
+                        Bonés
+                      </option>
+
+                      <option value="Acessórios">
+                        Acessórios
+                      </option>
+                    </select>
+                  </label>
+
+                  <Campo
+                    label="Subcategoria"
+                    name="subcategoria"
+                    value={
+                      form.subcategoria
+                    }
+                    onChange={
+                      atualizarCampo
+                    }
+                    required
+                  />
+                </div>
+
+                <Campo
+                  label="Preço"
+                  name="preco"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  inputMode="decimal"
+                  value={form.preco}
+                  onChange={
+                    atualizarCampo
+                  }
+                  required
                 />
 
-                <Checkbox
-                  name="novidade"
-                  checked={form.novidade}
-                  onChange={atualizarCampo}
-                  label="Novidade"
+                <Campo
+                  label="Cores"
+                  name="cores"
+                  value={form.cores}
+                  onChange={
+                    atualizarCampo
+                  }
+                  placeholder="Preto, Branco, Cinza"
+                  required
                 />
-              </div>
 
-              <div style={acoesModal}>
-                <button
-                  type="button"
-                  onClick={fecharModal}
-                  disabled={salvando}
-                  style={botaoSecundario}
-                >
-                  Cancelar
-                </button>
+                <Campo
+                  label="Tamanhos"
+                  name="tamanhos"
+                  value={form.tamanhos}
+                  onChange={
+                    atualizarCampo
+                  }
+                  placeholder="P, M, G, GG"
+                  required
+                />
 
-                <button
-                  type="submit"
-                  disabled={salvando}
-                  style={{
-                    ...botaoPrincipal,
-                    opacity:
-                      salvando ? 0.6 : 1,
-                  }}
-                >
-                  {salvando
-                    ? 'Salvando...'
-                    : produtoEditando
-                      ? 'Salvar alterações'
-                      : 'Cadastrar produto'}
-                </button>
-              </div>
-            </form>
+                <div className="admin-form__checkboxes">
+                  <Checkbox
+                    name="disponivel"
+                    checked={
+                      form.disponivel
+                    }
+                    onChange={
+                      atualizarCampo
+                    }
+                    label="Disponível"
+                  />
+
+                  <Checkbox
+                    name="importado"
+                    checked={
+                      form.importado
+                    }
+                    onChange={
+                      atualizarCampo
+                    }
+                    label="Produto importado"
+                  />
+
+                  <Checkbox
+                    name="novidade"
+                    checked={
+                      form.novidade
+                    }
+                    onChange={
+                      atualizarCampo
+                    }
+                    label="Novidade"
+                  />
+                </div>
+
+                <div className="admin-form__actions">
+                  <button
+                    type="button"
+                    onClick={
+                      fecharModal
+                    }
+                    disabled={salvando}
+                    className="admin-button admin-button--secondary"
+                  >
+                    Cancelar
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={salvando}
+                    className="admin-button admin-button--primary"
+                  >
+                    {salvando
+                      ? 'Salvando...'
+                      : produtoEditando
+                        ? 'Salvar alterações'
+                        : 'Cadastrar produto'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
@@ -908,33 +994,30 @@ function Admin() {
 }
 
 function Campo({
-  label: titulo,
+  label,
   ...propriedades
 }) {
   return (
-    <label style={label}>
-      {titulo}
+    <label className="admin-field">
+      <span>{label}</span>
 
-      <input
-        {...propriedades}
-        style={input}
-      />
+      <input {...propriedades} />
     </label>
   )
 }
 
 function Checkbox({
-  label: titulo,
+  label,
   ...propriedades
 }) {
   return (
-    <label style={checkbox}>
+    <label className="admin-checkbox">
       <input
         type="checkbox"
         {...propriedades}
       />
 
-      {titulo}
+      <span>{label}</span>
     </label>
   )
 }
@@ -944,322 +1027,12 @@ function Resumo({
   valor,
 }) {
   return (
-    <div style={resumo}>
-      <small style={resumoTitulo}>
-        {titulo}
-      </small>
+    <div className="admin-summary">
+      <small>{titulo}</small>
 
-      <strong style={resumoValor}>
-        {valor}
-      </strong>
+      <strong>{valor}</strong>
     </div>
   )
-}
-
-const pagina = {
-  minHeight: '100vh',
-  padding: '120px 6% 60px',
-  background: '#f7f7f5',
-}
-
-const container = {
-  maxWidth: '1200px',
-  margin: '0 auto',
-}
-
-const cabecalhoPagina = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '20px',
-  marginBottom: '40px',
-  flexWrap: 'wrap',
-}
-
-const marca = {
-  fontSize: '12px',
-  letterSpacing: '0.18em',
-  fontWeight: 700,
-}
-
-const tituloPagina = {
-  margin: '8px 0',
-  fontSize: 'clamp(32px, 5vw, 54px)',
-}
-
-const descricao = {
-  margin: 0,
-  opacity: 0.65,
-}
-
-const acoesCabecalho = {
-  display: 'flex',
-  gap: '10px',
-  flexWrap: 'wrap',
-}
-
-const resumos = {
-  display: 'flex',
-  gap: '12px',
-  marginBottom: '24px',
-  flexWrap: 'wrap',
-}
-
-const resumo = {
-  minWidth: '150px',
-  background: '#fff',
-  border: '1px solid #e5e5e5',
-  padding: '18px 22px',
-}
-
-const resumoTitulo = {
-  opacity: 0.55,
-}
-
-const resumoValor = {
-  display: 'block',
-  fontSize: '26px',
-  marginTop: '4px',
-}
-
-const listaProdutos = {
-  display: 'grid',
-  gap: '12px',
-}
-
-const cardProduto = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '18px',
-  padding: '16px',
-  background: '#fff',
-  border: '1px solid #e5e5e5',
-  flexWrap: 'wrap',
-}
-
-const fotoProduto = {
-  width: '80px',
-  height: '80px',
-  display: 'grid',
-  placeItems: 'center',
-  background: '#eee',
-  flexShrink: 0,
-  overflow: 'hidden',
-}
-
-const imagemProduto = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
-}
-
-const dadosProduto = {
-  flex: 1,
-  minWidth: '180px',
-}
-
-const marcaProduto = {
-  opacity: 0.55,
-  textTransform: 'uppercase',
-  letterSpacing: '0.08em',
-}
-
-const nomeProduto = {
-  margin: '5px 0',
-}
-
-const acoesProduto = {
-  display: 'flex',
-  gap: '8px',
-  flexWrap: 'wrap',
-  alignItems: 'center',
-}
-
-const botaoPrincipal = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '8px',
-  border: 0,
-  padding: '13px 18px',
-  background: '#111',
-  color: '#fff',
-  cursor: 'pointer',
-  borderRadius: '4px',
-}
-
-const botaoSecundario = {
-  ...botaoPrincipal,
-  background: '#eee',
-  color: '#111',
-}
-
-const botaoIcone = {
-  width: '38px',
-  height: '38px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  background: '#fff',
-  border: '1px solid #ddd',
-  cursor: 'pointer',
-  borderRadius: '4px',
-}
-
-const etiquetaAtiva = {
-  border: '1px solid #111',
-  background: '#111',
-  color: '#fff',
-  padding: '9px 12px',
-  cursor: 'pointer',
-  borderRadius: '100px',
-}
-
-const etiquetaInativa = {
-  ...etiquetaAtiva,
-  background: '#fff',
-  color: '#555',
-  border: '1px solid #ddd',
-}
-
-const caixaVazia = {
-  padding: '60px 30px',
-  background: '#fff',
-  border: '1px solid #e5e5e5',
-  textAlign: 'center',
-}
-
-const fundoModal = {
-  position: 'fixed',
-  inset: 0,
-  zIndex: 1000,
-  background: 'rgba(0, 0, 0, 0.55)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '20px',
-  overflowY: 'auto',
-}
-
-const modal = {
-  width: '100%',
-  maxWidth: '650px',
-  maxHeight: '90vh',
-  boxSizing: 'border-box',
-  overflowY: 'auto',
-  background: '#fff',
-  padding: '28px',
-}
-
-const cabecalhoModal = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  gap: '20px',
-  marginBottom: '28px',
-}
-
-const formulario = {
-  display: 'grid',
-  gap: '16px',
-}
-
-const gradeCampos = {
-  display: 'grid',
-  gridTemplateColumns:
-    'repeat(auto-fit, minmax(200px, 1fr))',
-  gap: '16px',
-}
-
-const label = {
-  display: 'grid',
-  gap: '7px',
-  fontSize: '14px',
-  fontWeight: 600,
-}
-
-const input = {
-  width: '100%',
-  boxSizing: 'border-box',
-  padding: '12px',
-  border: '1px solid #ccc',
-  background: '#fff',
-  font: 'inherit',
-}
-
-const inputArquivo = {
-  width: '100%',
-  boxSizing: 'border-box',
-  padding: '11px',
-  border: '1px solid #ccc',
-  background: '#fff',
-}
-
-const areaImagem = {
-  width: '100%',
-  height: '220px',
-  background: '#f4f4f2',
-  border: '1px dashed #bbb',
-  overflow: 'hidden',
-}
-
-const preview = {
-  width: '100%',
-  height: '100%',
-  objectFit: 'contain',
-}
-
-const semImagem = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '10px',
-  opacity: 0.55,
-}
-
-const ajuda = {
-  opacity: 0.55,
-  fontWeight: 400,
-}
-
-const checkboxes = {
-  display: 'flex',
-  gap: '20px',
-  flexWrap: 'wrap',
-}
-
-const checkbox = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  cursor: 'pointer',
-}
-
-const acoesModal = {
-  display: 'flex',
-  justifyContent: 'flex-end',
-  gap: '10px',
-  marginTop: '10px',
-  flexWrap: 'wrap',
-}
-
-const mensagemErro = {
-  padding: '12px 14px',
-  marginBottom: '18px',
-  background: '#fff0f0',
-  border: '1px solid #ffd1d1',
-  fontSize: '14px',
-}
-
-const mensagemSucesso = {
-  padding: '12px 14px',
-  marginBottom: '18px',
-  background: '#effaf1',
-  border: '1px solid #cbe8d0',
-  fontSize: '14px',
 }
 
 export default Admin
