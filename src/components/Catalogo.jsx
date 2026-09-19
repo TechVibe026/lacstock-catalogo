@@ -59,6 +59,8 @@ function Catalogo() {
   const [painelAberto, setPainelAberto] =
     useState(false)
 
+
+
   const [linkCopiado, setLinkCopiado] =
     useState(false)
 
@@ -389,6 +391,8 @@ function Catalogo() {
       }
     }
 
+
+
   return (
     <>
       <section
@@ -653,6 +657,10 @@ function Catalogo() {
           )
         )}
       </section>
+
+      
+
+    
 
       <FilterPanel
         aberto={painelAberto}

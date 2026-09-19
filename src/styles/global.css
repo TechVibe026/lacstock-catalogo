@@ -66,6 +66,19 @@ button {
   width: 100%;
   background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid var(--color-border);
+
+  position: sticky;
+  top: 0;
+  z-index: 300;
+  transition: transform 0.35s ease;
+}
+
+.header--visible {
+  transform: translateY(0);
+}
+
+.header--hidden {
+  transform: translateY(-100%);
 }
 
 .header__container {
@@ -82,6 +95,13 @@ button {
   display: flex;
   align-items: center;
   gap: 9px;
+}
+
+.header__logo {
+  display: block;
+  width: auto;
+  height: 58px;
+  object-fit: contain;
 }
 
 .header__symbol {
@@ -160,6 +180,10 @@ button {
     left: 50%;
     transform: translateX(-50%);
   }
+
+  .header__logo {
+  height: 52px;
+}
 
   .header__brand div span {
     display: none;
@@ -512,6 +536,8 @@ button {
 
   background: var(--color-brand);
 }
+
+
 
 /* GRID */
 
@@ -2706,5 +2732,153 @@ button.product-page__option:hover {
         22px +
         env(safe-area-inset-bottom)
       );
+  }
+}
+
+
+/* SIDEBAR DE CATEGORIAS - MOBILE */
+
+.catalog__sidebar {
+  display: none;
+}
+
+@media (max-width: 700px) {
+
+  /* Esconde as categorias horizontais no celular */
+  .catalog__categories {
+    display: none;
+  }
+
+  /* Sidebar presa na esquerda */
+  .catalog__sidebar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    top: 100px;
+    z-index: 100;
+
+    align-items: flex-start;
+
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+  }
+
+  /* Aparece quando estiver no topo ou subindo */
+  .catalog__sidebar--visible {
+    transform: translateX(0);
+  }
+
+  /* Aba lateral */
+  .catalog__sidebar-trigger {
+   width: 28px;
+height: 76px;
+
+background: rgba(17, 17, 17, 0.58);
+
+border: 1px solid rgba(255, 255, 255, 0.1);
+border-left: 0;
+border-radius: 0 10px 10px 0;
+
+backdrop-filter: blur(14px);
+-webkit-backdrop-filter: blur(14px);
+
+box-shadow: 3px 6px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  .catalog__sidebar-trigger span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+  /* Menu que abre ao tocar */
+  .catalog__sidebar-menu {
+    width: 165px;
+    margin-left: 6px;
+    padding: 8px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    background: rgba(17, 17, 17, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    box-shadow: 8px 12px 30px rgba(0, 0, 0, 0.18);
+  }
+
+  .catalog__sidebar-category {
+    width: 100%;
+    padding: 11px 12px;
+
+    color: rgba(255, 255, 255, 0.62);
+
+    text-align: left;
+    font-size: 13px;
+
+    border-radius: 7px;
+  }
+
+  .catalog__sidebar-category--active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+  }
+}
+
+/* MENU MOBILE DO HEADER */
+
+.header__mobile-menu {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .header__mobile-menu {
+    position: absolute;
+    top: 68px;
+    left: 0;
+
+    width: 100%;
+    padding: 18px 24px 22px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    z-index: 200;
+  }
+
+  .header__mobile-menu button {
+    width: 100%;
+    padding: 13px 0;
+
+    text-align: left;
+
+    color: #111;
+    font-size: 15px;
+    font-weight: 500;
+
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+
+  .header__mobile-menu button:last-child {
+    border-bottom: 0;
   }
 }
