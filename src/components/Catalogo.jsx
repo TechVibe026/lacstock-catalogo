@@ -29,6 +29,8 @@ import { supabase } from '../lib/supabase'
 
 const categorias = [
   'Todos',
+  'Novidades',
+  'Importados',
   'Roupas',
   'Tênis',
   'Bonés',
@@ -43,8 +45,10 @@ function Catalogo() {
     setSearchParams,
   ] = useSearchParams()
 
-  const [produtosSupabase, setProdutosSupabase] =
-    useState([])
+  const [
+    produtosSupabase,
+    setProdutosSupabase,
+  ] = useState([])
 
   const [carregando, setCarregando] =
     useState(true)
@@ -59,35 +63,37 @@ function Catalogo() {
     useState(false)
 
   useEffect(() => {
-    const carregarProdutosSupabase = async () => {
-      setCarregando(true)
-      setErroCatalogo('')
+    const carregarProdutosSupabase =
+      async () => {
+        setCarregando(true)
+        setErroCatalogo('')
 
-      const { data, error } = await supabase
-        .from('produtos')
-        .select('*')
-        .eq('disponivel', true)
-        .order('created_at', {
-          ascending: false,
-        })
+        const { data, error } =
+          await supabase
+            .from('produtos')
+            .select('*')
+            .eq('disponivel', true)
+            .order('created_at', {
+              ascending: false,
+            })
 
-      if (error) {
-        console.error(
-          'Erro ao carregar catálogo:',
-          error,
-        )
+        if (error) {
+          console.error(
+            'Erro ao carregar catálogo:',
+            error,
+          )
 
-        setErroCatalogo(
-          'Não foi possível carregar os novos produtos.',
-        )
+          setErroCatalogo(
+            'Não foi possível carregar os novos produtos.',
+          )
 
+          setCarregando(false)
+          return
+        }
+
+        setProdutosSupabase(data ?? [])
         setCarregando(false)
-        return
       }
-
-      setProdutosSupabase(data ?? [])
-      setCarregando(false)
-    }
 
     carregarProdutosSupabase()
   }, [])
@@ -235,10 +241,18 @@ function Catalogo() {
               : []
 
           const correspondeCategoria =
-            categoriaAtiva ===
-              'Todos' ||
-            categoria ===
-              categoriaAtiva
+            categoriaAtiva === 'Todos' ||
+            (
+              categoriaAtiva ===
+                'Novidades' &&
+              produto.novidade === true
+            ) ||
+            (
+              categoriaAtiva ===
+                'Importados' &&
+              produto.importado === true
+            ) ||
+            categoria === categoriaAtiva
 
           const correspondeBusca =
             termo === '' ||
