@@ -1,53 +1,53 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { LockKeyhole } from 'lucide-react'
 
-import { supabase } from '../lib/supabase'
+const EMAIL_MOCK = 'luan@admin.com'
+const SENHA_MOCK = '123'
 
 function AdminLogin() {
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [carregando, setCarregando] = useState(false)
   const [erro, setErro] = useState('')
-  const [autenticado, setAutenticado] = useState(false)
 
-  const entrar = async (event) => {
+  const entrar = (event) => {
     event.preventDefault()
-
-    setCarregando(true)
     setErro('')
 
-    const { error } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password: senha,
-      })
+    const emailDigitado =
+      email.trim().toLowerCase()
 
-    setCarregando(false)
+    if (
+      emailDigitado === EMAIL_MOCK &&
+      senha === SENHA_MOCK
+    ) {
+      localStorage.setItem(
+        'lacstock-admin',
+        'autenticado',
+      )
 
-    if (error) {
-      setErro('E-mail ou senha incorretos.')
+      navigate('/admin')
       return
     }
 
-    setAutenticado(true)
-    navigate('/admin')
-  }
-
-  if (autenticado) {
-    return <Navigate to="/admin" replace />
+    setErro('E-mail ou senha incorretos.')
   }
 
   return (
     <main style={pagina}>
       <section style={card}>
         <div style={icone}>
-          <LockKeyhole size={25} />
+          <LockKeyhole
+            size={25}
+            strokeWidth={1.7}
+          />
         </div>
 
-        <span style={marca}>LACSTOCK</span>
+        <span style={marca}>
+          LACSTOCK
+        </span>
 
         <h1 style={titulo}>
           Área administrativa
@@ -59,11 +59,7 @@ function AdminLogin() {
 
         <form
           onSubmit={entrar}
-          style={{
-            display: 'grid',
-            gap: '16px',
-            marginTop: '30px',
-          }}
+          style={formulario}
         >
           <label style={label}>
             E-mail
@@ -77,7 +73,7 @@ function AdminLogin() {
               required
               autoComplete="email"
               style={input}
-              placeholder="admin@lacstock.com"
+              placeholder="luan@admin.com"
             />
           </label>
 
@@ -93,7 +89,7 @@ function AdminLogin() {
               required
               autoComplete="current-password"
               style={input}
-              placeholder="••••••••"
+              placeholder="Digite sua senha"
             />
           </label>
 
@@ -105,15 +101,9 @@ function AdminLogin() {
 
           <button
             type="submit"
-            disabled={carregando}
-            style={{
-              ...botao,
-              opacity: carregando ? 0.65 : 1,
-            }}
+            style={botao}
           >
-            {carregando
-              ? 'Entrando...'
-              : 'Entrar'}
+            Entrar
           </button>
         </form>
       </section>
@@ -133,6 +123,7 @@ const pagina = {
 const card = {
   width: '100%',
   maxWidth: '430px',
+  boxSizing: 'border-box',
   background: '#fff',
   border: '1px solid #e5e5e5',
   padding: '40px',
@@ -161,8 +152,15 @@ const titulo = {
 }
 
 const descricao = {
+  margin: 0,
   opacity: 0.6,
   lineHeight: 1.5,
+}
+
+const formulario = {
+  display: 'grid',
+  gap: '16px',
+  marginTop: '30px',
 }
 
 const label = {
@@ -177,15 +175,18 @@ const input = {
   boxSizing: 'border-box',
   padding: '14px',
   border: '1px solid #ccc',
+  background: '#fff',
+  color: '#111',
   font: 'inherit',
-  outline: 'none',
 }
 
 const botao = {
+  width: '100%',
   border: 0,
   padding: '15px',
   background: '#111',
   color: '#fff',
+  font: 'inherit',
   fontWeight: 700,
   cursor: 'pointer',
 }
